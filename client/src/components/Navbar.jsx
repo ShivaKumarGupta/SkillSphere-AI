@@ -29,6 +29,9 @@ export default function Navbar() {
           <NavLink to="/projects" className={linkClass}>
             Projects
           </NavLink>
+          <NavLink to="/certificates" className={linkClass}>
+            Certificates
+          </NavLink>
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-slate-500 sm:block">{user.name}</span>
