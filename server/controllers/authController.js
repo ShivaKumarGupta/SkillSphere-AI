@@ -1,3 +1,4 @@
+import toUserResponse from '../utils/userResponse.js'
 import User from '../models/User.js'
 import generateToken from '../utils/generateToken.js'
 
@@ -59,5 +60,5 @@ export const loginUser = async (req, res) => {
 }
 
 export const getMe = (req, res) => {
-  res.json(req.user)
+  res.json(toUserResponse(req.user))
 }

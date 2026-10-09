@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import connectDB from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
+import profileRoutes from './routes/profileRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -17,6 +18,7 @@ app.get('/api/health', (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/profile', profileRoutes)
 
 const PORT = process.env.PORT || 5000
 

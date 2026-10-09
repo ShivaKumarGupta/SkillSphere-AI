@@ -16,19 +16,26 @@ export default function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
-  const saveSession = (data) => {
-    localStorage.setItem('token', data.token)
-    setUser({ _id: data._id, name: data.name, email: data.email })
+  const startSession = async (token) => {
+    localStorage.setItem('token', token)
+    const { data } = await api.get('/auth/me')
+    setUser(data)
   }
 
   const register = async (name, email, password) => {
     const { data } = await api.post('/auth/register', { name, email, password })
-    saveSession(data)
+    await startSession(data.token)
   }
 
   const login = async (email, password) => {
     const { data } = await api.post('/auth/login', { email, password })
-    saveSession(data)
+    await startSession(data.token)
+  }
+
+  const updateProfile = async (profile) => {
+    const { data } = await api.put('/profile', profile)
+    setUser(data)
+    return data
   }
 
   const logout = () => {
@@ -37,7 +44,7 @@ export default function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, register, login, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   )
