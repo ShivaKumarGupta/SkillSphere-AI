@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js'
 import profileRoutes from './routes/profileRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
 import certificateRoutes from './routes/certificateRoutes.js'
+import dsaRoutes from './routes/dsaRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/certificates', certificateRoutes)
+app.use('/api/dsa', dsaRoutes)
 
 const PORT = process.env.PORT || 5000
 

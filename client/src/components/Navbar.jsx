@@ -32,6 +32,9 @@ export default function Navbar() {
           <NavLink to="/certificates" className={linkClass}>
             Certificates
           </NavLink>
+          <NavLink to="/dsa" className={linkClass}>
+             DSA
+          </NavLink>
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-slate-500 sm:block">{user.name}</span>

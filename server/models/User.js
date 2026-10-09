@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema(
     },
     github: { type: String, trim: true, maxlength: 200, default: '' },
     linkedin: { type: String, trim: true, maxlength: 200, default: '' },
+    dsaWeeklyGoal: { type: Number, min: 1, max: 200, default: 10 },
   },
   { timestamps: true }
 )
