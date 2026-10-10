@@ -16,7 +16,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-white shadow-sm print:hidden">
       <div className="mx-auto flex max-w-4xl items-center justify-between p-4">
         <div className="flex items-center gap-2">
           <span className="mr-4 text-lg font-bold text-indigo-600">SkillSphere AI</span>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import TagInput from '../components/TagInput'
+import { useNavigate } from 'react-router-dom'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500 disabled:bg-slate-100'
@@ -129,6 +130,7 @@ function Entry({ onRemove, children }) {
 }
 
 export default function Resume() {
+  const navigate = useNavigate()
   const [form, setForm] = useState(null)
   const [loadError, setLoadError] = useState('')
   const [message, setMessage] = useState(null)
@@ -176,6 +178,17 @@ export default function Resume() {
       setSaving(false)
     }
   }
+    const handlePreview = async () => {
+    setMessage(null)
+    setSaving(true)
+    try {
+      await saveForm()
+      navigate('/resume/preview')
+    } catch (err) {
+      showMessage('error', err.response?.data?.message || 'Something went wrong')
+      setSaving(false)
+    }
+  }
 
   const handleAutofill = async () => {
     const ok = window.confirm(
@@ -217,6 +230,14 @@ export default function Resume() {
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-60"
           >
             Refresh from my profile data
+          </button>
+          <button
+            type="button"
+            onClick={handlePreview}
+            disabled={saving}
+            className="rounded-lg border border-indigo-300 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-60"
+          >
+            Save &amp; preview
           </button>
           <button
             type="button"
