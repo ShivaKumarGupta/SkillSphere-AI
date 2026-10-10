@@ -8,6 +8,7 @@ import projectRoutes from './routes/projectRoutes.js'
 import certificateRoutes from './routes/certificateRoutes.js'
 import dsaRoutes from './routes/dsaRoutes.js'
 import dashboardRoutes from './routes/dashboardRoutes.js'
+import resumeRoutes from './routes/resumeRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -27,6 +28,7 @@ app.use('/api/projects', projectRoutes)
 app.use('/api/certificates', certificateRoutes)
 app.use('/api/dsa', dsaRoutes)
 app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/resume', resumeRoutes)
 
 const PORT = process.env.PORT || 5000
 

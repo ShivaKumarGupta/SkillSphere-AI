@@ -8,6 +8,7 @@ import Layout from './components/Layout'
 import Projects from './pages/Projects'
 import Certificates from './pages/Certificates'
 import Dsa from './pages/Dsa'
+import Resume from './pages/Resume'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/certificates" element={<Certificates />} />
         <Route path="/dsa" element={<Dsa />} />
+        <Route path="/resume" element={<Resume />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
