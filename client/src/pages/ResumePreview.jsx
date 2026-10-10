@@ -54,6 +54,12 @@ export default function ResumePreview() {
           <p className="mt-1 text-slate-500">This is your last saved version.</p>
         </div>
         <div className="flex gap-3">
+            <Link
+            to="/resume/upload"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Upload existing resume
+          </Link>
           <Link
             to="/resume"
             className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
