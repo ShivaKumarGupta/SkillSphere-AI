@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai'
 
 const DEFAULT_MODEL = 'gemini-3.8-flash'
-const TIMEOUT_MS = 30000
+const TIMEOUT_MS = 90000
 
 // A friendly error that is safe to show to students
 export class AiError extends Error {
