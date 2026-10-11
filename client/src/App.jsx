@@ -11,6 +11,7 @@ import Dsa from './pages/Dsa'
 import Resume from './pages/Resume'
 import ResumePreview from './pages/ResumePreview'
 import ResumeUpload from './pages/ResumeUpload'
+import ResumeAnalysis from './pages/ResumeAnalysis'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/resume" element={<Resume />} />
         <Route path="/resume/preview" element={<ResumePreview />} />
         <Route path="/resume/upload" element={<ResumeUpload />} />
+        <Route path="/resume/analysis" element={<ResumeAnalysis />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

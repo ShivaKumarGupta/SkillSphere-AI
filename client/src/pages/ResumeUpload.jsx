@@ -97,12 +97,20 @@ export default function ResumeUpload() {
             We read the text from your PDF. The AI Resume Analyzer will use it later.
           </p>
         </div>
-        <Link
-          to="/resume"
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-        >
-          Back to resume builder
-        </Link>
+                <div className="flex gap-3">
+          <Link
+            to="/resume/analysis"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+          >
+            Analyze with AI
+          </Link>
+          <Link
+            to="/resume"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+          >
+            Back to resume builder
+          </Link>
+        </div>
       </div>
 
       {message && <p className="rounded-lg bg-green-50 p-3 text-sm text-green-700">{message}</p>}
