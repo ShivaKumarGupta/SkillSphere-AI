@@ -106,7 +106,15 @@ const validateRoadmap = (raw) => {
 // Stops the student's text from closing our data tags and pretending to be part of the prompt
 const DATA_TAGS =
   /<\/?(target_role|experience_level|skills|projects|certificates|dsa_summary)>/gi
-const safe = (value) => String(value || '').replace(DATA_TAGS, '')
+const safe = (value) => {
+  let text = String(value || '')
+  let previous
+  do {
+    previous = text
+    text = text.replace(DATA_TAGS, '')
+  } while (text !== previous)
+  return text
+}
 
 // ---------- gathering the input ----------
 

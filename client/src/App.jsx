@@ -13,6 +13,7 @@ import ResumePreview from './pages/ResumePreview'
 import ResumeUpload from './pages/ResumeUpload'
 import ResumeAnalysis from './pages/ResumeAnalysis'
 import Roadmap from './pages/Roadmap'
+import Assistant from './pages/Assistant'
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path="/resume/upload" element={<ResumeUpload />} />
         <Route path="/resume/analysis" element={<ResumeAnalysis />} />
         <Route path="/roadmap" element={<Roadmap />} />
+        <Route path="/assistant" element={<Assistant />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

@@ -11,6 +11,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js'
 import resumeRoutes from './routes/resumeRoutes.js'
 import aiRoutes from './routes/aiRoutes.js'
 import roadmapRoutes from './routes/roadmapRoutes.js'
+import assistantRoutes from './routes/assistantRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -33,6 +34,7 @@ app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/resume', resumeRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/roadmap', roadmapRoutes)
+app.use('/api/assistant', assistantRoutes)
 
 const PORT = process.env.PORT || 5000
 
