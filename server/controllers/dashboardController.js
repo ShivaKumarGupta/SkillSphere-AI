@@ -3,6 +3,7 @@ import Certificate from '../models/Certificate.js'
 import DsaProblem from '../models/DsaProblem.js'
 import { buildDsaStats, parseTodayKey } from '../utils/dsaStats.js'
 import { getProfileCompletion } from '../utils/profileCompletion.js'
+import Roadmap from '../models/Roadmap.js'
 
 const ratio = (value, target) => (target > 0 ? Math.min(1, value / target) : 0)
 const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase()
@@ -12,10 +13,11 @@ export const getDashboard = async (req, res) => {
     const user = req.user
     const todayKey = parseTodayKey(req.query.today)
 
-    const [projects, certificates, problems] = await Promise.all([
+      const [projects, certificates, problems, roadmapDoc] = await Promise.all([
       Project.find({ user: user._id }).select('name technologies status').lean(),
       Certificate.find({ user: user._id }).select('relatedSkill').lean(),
       DsaProblem.find({ user: user._id }).select('solvedDate difficulty topic').lean(),
+      Roadmap.findOne({ user: user._id }).select('milestones').lean(),
     ])
 
     const profile = getProfileCompletion(user)
@@ -116,6 +118,17 @@ export const getDashboard = async (req, res) => {
       }
     }
 
+        const milestones = roadmapDoc?.milestones || []
+    const doneMilestones = milestones.filter((m) => m.completed).length
+    const nextMilestone = milestones.find((m) => !m.completed)
+
+    if (milestones.length === 0) {
+      if (user.targetRole) {
+        add(3, 'Generate your career roadmap', 'Get a step-by-step plan for your target role, based on what you already know.', '/roadmap')
+      }
+    } else if (nextMilestone) {
+      add(4, `Next milestone: ${nextMilestone.title}`, `${doneMilestones} of ${milestones.length} roadmap milestones done.`, '/roadmap')
+    }
     const nextActions = actions
       .sort((a, b) => a.priority - b.priority)
       .slice(0, 4)
@@ -128,6 +141,11 @@ export const getDashboard = async (req, res) => {
       projects: { total: projects.length, byStatus },
       certificates: { total: certificates.length },
       dsa: { total: dsa.total, streak: dsa.streak, goal: dsa.goal },
+      roadmap: {
+        total: milestones.length,
+        done: doneMilestones,
+        next: nextMilestone ? nextMilestone.title : null,
+      },
       nextActions,
     })
   } catch (error) {

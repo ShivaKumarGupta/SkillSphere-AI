@@ -48,7 +48,7 @@ export default function Dashboard() {
   if (error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
   if (!data) return <p className="text-slate-500">Loading your dashboard...</p>
 
-  const { readiness, skills, projects, certificates, dsa, nextActions } = data
+  const { readiness, skills, projects, certificates, dsa, roadmap, nextActions } = data
 
   return (
     <div className="space-y-6">
@@ -143,6 +143,31 @@ export default function Dashboard() {
           hint="Weekly DSA goal"
         />
       </div>
+
+            <Link to="/roadmap" className="block rounded-2xl bg-white p-6 shadow transition hover:shadow-md">
+        <div className="flex items-center justify-between">
+          <h2 className="font-semibold text-slate-800">Career roadmap</h2>
+          <span className="text-sm text-indigo-600">Open →</span>
+        </div>
+        {roadmap.total === 0 ? (
+          <p className="mt-2 text-sm text-slate-500">
+            Generate a personalised step-by-step plan for your target role.
+          </p>
+        ) : (
+          <>
+            <p className="mt-2 text-sm text-slate-600">
+              {roadmap.done} of {roadmap.total} milestones done
+              {roadmap.next ? ` · Next: ${roadmap.next}` : ' · All done 🎉'}
+            </p>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full rounded-full bg-indigo-600 transition-all"
+                style={{ width: `${Math.round((roadmap.done / roadmap.total) * 100)}%` }}
+              />
+            </div>
+          </>
+        )}
+      </Link>
 
       <div className="rounded-2xl bg-white p-6 shadow">
         <h2 className="font-semibold text-slate-800">Your skills</h2>
