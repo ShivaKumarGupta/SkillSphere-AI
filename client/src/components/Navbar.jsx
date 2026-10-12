@@ -41,6 +41,9 @@ export default function Navbar() {
           <NavLink to="/assistant" className={linkClass}>
            Assistant
           </NavLink>
+          <NavLink to="/interview" className={linkClass}>
+          Interview
+          </NavLink>
           <NavLink to="/resume" className={linkClass}>
              Resume
           </NavLink>

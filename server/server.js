@@ -12,6 +12,7 @@ import resumeRoutes from './routes/resumeRoutes.js'
 import aiRoutes from './routes/aiRoutes.js'
 import roadmapRoutes from './routes/roadmapRoutes.js'
 import assistantRoutes from './routes/assistantRoutes.js'
+import interviewRoutes from './routes/interviewRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -35,6 +36,7 @@ app.use('/api/resume', resumeRoutes)
 app.use('/api/ai', aiRoutes)
 app.use('/api/roadmap', roadmapRoutes)
 app.use('/api/assistant', assistantRoutes)
+app.use('/api/interviews', interviewRoutes)
 
 const PORT = process.env.PORT || 5000
 

@@ -18,6 +18,8 @@ const TAGS = [
   'resume_text',
   'conversation',
   'student_message',
+  'interview_setup',
+  'interview_transcript',
 ]
 const TAG_PATTERN = new RegExp(`</?(?:${TAGS.join('|')})>`, 'gi')
 
