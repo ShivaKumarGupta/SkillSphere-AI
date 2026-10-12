@@ -20,7 +20,7 @@ const list = [{ type: String, trim: true, maxlength: 300 }]
 const evaluationSchema = new mongoose.Schema(
   {
     overallScore: { type: Number, min: 0, max: 100, default: 0 },
-    technicalScore: { type: Number, min: 0, max: 10, default: 0 },
+    technicalScore: { type: Number, min: 0, max: 10, default: null },
     communicationScore: { type: Number, min: 0, max: 10, default: 0 },
     summary: { type: String, trim: true, maxlength: 600, default: '' },
     strengths: list,

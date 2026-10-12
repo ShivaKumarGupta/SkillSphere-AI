@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import useAuth from '../hooks/useAuth'
 import { todayKey } from '../utils/date'
+import InterviewResults from '../components/InterviewResults'
+import InterviewHistory from '../components/InterviewHistory'
 
 const TYPES = [
   ['Technical', 'Technical: concepts and your projects'],
@@ -21,6 +23,16 @@ const CATEGORY_STYLES = {
 }
 
 const answersOf = (session) => Object.fromEntries(session.questions.map((q) => [q.id, q.answer]))
+
+const summaryOf = (s) => ({
+  id: s.id,
+  role: s.role,
+  type: s.type,
+  difficulty: s.difficulty,
+  questionCount: s.questions.length,
+  overallScore: s.evaluation?.overallScore ?? 0,
+  completedAt: s.completedAt,
+})
 
 function Setup({ defaultRole, onStart, starting }) {
   const [form, setForm] = useState({
@@ -103,11 +115,12 @@ function Setup({ defaultRole, onStart, starting }) {
   )
 }
 
-function Runner({ session, onDiscarded }) {
+function Runner({ session, onDiscarded, onFinished }) {
   const [index, setIndex] = useState(0)
   const [answers, setAnswers] = useState(() => answersOf(session))
   const [saved, setSaved] = useState(() => answersOf(session))
   const [saving, setSaving] = useState(false)
+  const [finishing, setFinishing] = useState(false)
   const [error, setError] = useState('')
 
   const total = session.questions.length
@@ -115,6 +128,7 @@ function Runner({ session, onDiscarded }) {
   const text = answers[question.id] ?? ''
   const isSaved = text === saved[question.id]
   const answeredCount = session.questions.filter((q) => (answers[q.id] || '').trim()).length
+  const busy = saving || finishing
 
   const saveCurrent = async () => {
     if (isSaved) return true
@@ -135,6 +149,33 @@ function Runner({ session, onDiscarded }) {
   const goTo = async (next) => {
     if (next < 0 || next >= total || next === index) return
     if (await saveCurrent()) setIndex(next)
+  }
+
+  const finish = async () => {
+    if (answeredCount === 0) {
+      setError('Answer at least one question before finishing')
+      return
+    }
+
+    const unanswered = total - answeredCount
+    const message =
+      unanswered > 0
+        ? `${unanswered} ${unanswered === 1 ? 'question is' : 'questions are'} unanswered and will score 0. Finish anyway?`
+        : 'Finish the interview and get your feedback?'
+    if (!window.confirm(message)) return
+
+    if (!(await saveCurrent())) return
+
+    setError('')
+    setFinishing(true)
+    try {
+      const res = await api.post(`/interviews/${session.id}/complete`)
+      onFinished(res.data)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Could not finish the interview. Your answers are saved.')
+    } finally {
+      setFinishing(false)
+    }
   }
 
   const discard = async () => {
@@ -180,10 +221,11 @@ function Runner({ session, onDiscarded }) {
           value={text}
           onChange={(e) => setAnswers((a) => ({ ...a, [question.id]: e.target.value }))}
           onBlur={saveCurrent}
+          disabled={finishing}
           rows={8}
           maxLength={MAX_ANSWER}
           placeholder="Type your answer here, as you would say it in an interview..."
-          className="mt-4 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none focus:border-indigo-500"
+          className="mt-4 w-full rounded-lg border border-slate-300 p-3 text-sm outline-none focus:border-indigo-500 disabled:bg-slate-50"
         />
         <div className="mt-1 flex justify-between text-xs text-slate-400">
           <span>{saving ? 'Saving...' : isSaved ? 'Saved' : 'Unsaved changes. They save when you move on.'}</span>
@@ -198,21 +240,21 @@ function Runner({ session, onDiscarded }) {
           <div className="flex gap-3">
             <button
               onClick={() => goTo(index - 1)}
-              disabled={index === 0 || saving}
+              disabled={index === 0 || busy}
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               Previous
             </button>
             <button
               onClick={() => goTo(index + 1)}
-              disabled={index === total - 1 || saving}
+              disabled={index === total - 1 || busy}
               className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50"
             >
               Next
             </button>
             <button
               onClick={saveCurrent}
-              disabled={isSaved || saving}
+              disabled={isSaved || busy}
               className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
             >
               Save
@@ -226,7 +268,7 @@ function Runner({ session, onDiscarded }) {
                 <button
                   key={q.id}
                   onClick={() => goTo(i)}
-                  disabled={saving}
+                  disabled={busy}
                   aria-label={`Go to question ${i + 1}`}
                   className={`h-8 w-8 rounded-full text-xs font-semibold ${
                     i === index
@@ -243,15 +285,26 @@ function Runner({ session, onDiscarded }) {
           </div>
         </div>
 
-        {index === total - 1 && (
-          <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm text-slate-500">
-            That is the last question. Your answers are saved. Scoring and feedback are added in the
-            next step.
-          </p>
-        )}
+        <div className="mt-6 border-t border-slate-200 pt-4">
+          <button
+            onClick={finish}
+            disabled={busy || answeredCount === 0}
+            className="rounded-lg bg-green-600 px-6 py-2.5 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+          >
+            {finishing ? 'Evaluating your answers...' : 'Finish and get feedback'}
+          </button>
+          {finishing && (
+            <p className="mt-2 text-sm text-slate-500">
+              This can take up to a minute. Please don't close the page.
+            </p>
+          )}
+          {!finishing && answeredCount === 0 && (
+            <p className="mt-2 text-xs text-slate-400">Answer at least one question to finish.</p>
+          )}
+        </div>
       </div>
 
-      <button onClick={discard} className="text-sm text-slate-500 hover:text-red-600">
+      <button onClick={discard} disabled={finishing} className="text-sm text-slate-500 hover:text-red-600 disabled:opacity-50">
         Discard this interview
       </button>
     </div>
@@ -261,8 +314,11 @@ function Runner({ session, onDiscarded }) {
 export default function Interview() {
   const { user } = useAuth()
   const [session, setSession] = useState(undefined) // undefined = loading, null = none in progress
+  const [result, setResult] = useState(null)
+  const [history, setHistory] = useState([])
   const [error, setError] = useState('')
   const [starting, setStarting] = useState(false)
+  const [busyId, setBusyId] = useState(null)
 
   useEffect(() => {
     api
@@ -272,6 +328,11 @@ export default function Interview() {
         setError('Could not load your interview')
         setSession(null)
       })
+
+    api
+      .get('/interviews')
+      .then((res) => setHistory(res.data))
+      .catch(() => {})
   }, [])
 
   const start = async (setup) => {
@@ -287,6 +348,41 @@ export default function Interview() {
     }
   }
 
+  const handleFinished = (completed) => {
+    setResult(completed)
+    setSession(null)
+    setHistory((h) => [summaryOf(completed), ...h.filter((x) => x.id !== completed.id)])
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const viewPast = async (id) => {
+    setError('')
+    setBusyId(id)
+    try {
+      const res = await api.get(`/interviews/${id}`)
+      setResult(res.data)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      setError('Could not open that interview')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const deletePast = async (item) => {
+    if (!window.confirm(`Delete this ${item.role} interview? This cannot be undone.`)) return
+    setError('')
+    setBusyId(item.id)
+    try {
+      await api.delete(`/interviews/${item.id}`)
+      setHistory((h) => h.filter((x) => x.id !== item.id))
+    } catch {
+      setError('Could not delete the interview')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   if (session === undefined) return <p className="text-slate-500">Loading...</p>
 
   return (
@@ -298,16 +394,26 @@ export default function Interview() {
 
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
 
-      {session ? (
-        <Runner key={session.id} session={session} onDiscarded={() => setSession(null)} />
+      {result ? (
+        <InterviewResults session={result} onBack={() => setResult(null)} />
+      ) : session ? (
+        <Runner
+          key={session.id}
+          session={session}
+          onDiscarded={() => setSession(null)}
+          onFinished={handleFinished}
+        />
       ) : (
-        <Setup defaultRole={user.targetRole || ''} onStart={start} starting={starting} />
+        <>
+          <Setup defaultRole={user.targetRole || ''} onStart={start} starting={starting} />
+          <InterviewHistory items={history} onView={viewPast} onDelete={deletePast} busyId={busyId} />
+        </>
       )}
 
       <p className="text-xs text-slate-400">
-        AI-written questions are for practice and may not match a real interview. Your profile data
-        and resume text are sent to an AI provider to write them, and starting an interview uses
-        one of your daily AI requests.
+        AI-written questions and scores are for practice and may not match a real interview. Your
+        profile data, resume text and answers are sent to an AI provider, and starting and
+        finishing an interview each use one of your daily AI requests.
       </p>
     </div>
   )
