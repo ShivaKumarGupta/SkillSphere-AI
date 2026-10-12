@@ -4,6 +4,7 @@ import useAuth from '../hooks/useAuth'
 import { todayKey } from '../utils/date'
 import InterviewResults from '../components/InterviewResults'
 import InterviewHistory from '../components/InterviewHistory'
+import { Link } from 'react-router-dom'
 
 const TYPES = [
   ['Technical', 'Technical: concepts and your projects'],
@@ -387,9 +388,17 @@ export default function Interview() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">AI Mock Interview</h1>
-        <p className="mt-1 text-slate-500">Practise with questions written for your profile.</p>
+     <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">AI Mock Interview</h1>
+          <p className="mt-1 text-slate-500">Practise with questions written for your profile.</p>
+        </div>
+        <Link
+          to="/interview/analytics"
+          className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+        >
+          View analytics
+        </Link>
       </div>
 
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}

@@ -4,6 +4,8 @@ import DsaProblem from '../models/DsaProblem.js'
 import { buildDsaStats, parseTodayKey } from '../utils/dsaStats.js'
 import { getProfileCompletion } from '../utils/profileCompletion.js'
 import Roadmap from '../models/Roadmap.js'
+import InterviewSession from '../models/InterviewSession.js'
+import { buildInterviewStats, INTERVIEW_STATS_FIELDS } from '../utils/interviewStats.js'
 
 const ratio = (value, target) => (target > 0 ? Math.min(1, value / target) : 0)
 const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase()
@@ -13,11 +15,16 @@ export const getDashboard = async (req, res) => {
     const user = req.user
     const todayKey = parseTodayKey(req.query.today)
 
-      const [projects, certificates, problems, roadmapDoc] = await Promise.all([
+    const [projects, certificates, problems, roadmapDoc, interviewDocs] = await Promise.all([
       Project.find({ user: user._id }).select('name technologies status').lean(),
       Certificate.find({ user: user._id }).select('relatedSkill').lean(),
       DsaProblem.find({ user: user._id }).select('solvedDate difficulty topic').lean(),
       Roadmap.findOne({ user: user._id }).select('milestones').lean(),
+      InterviewSession.find({ user: user._id, status: 'completed' })
+        .select(INTERVIEW_STATS_FIELDS)
+        .sort({ completedAt: -1 })
+        .limit(50)
+        .lean(),
     ])
 
     const profile = getProfileCompletion(user)
@@ -129,6 +136,20 @@ export const getDashboard = async (req, res) => {
     } else if (nextMilestone) {
       add(4, `Next milestone: ${nextMilestone.title}`, `${doneMilestones} of ${milestones.length} roadmap milestones done.`, '/roadmap')
     }
+    const interviewStats = buildInterviewStats(interviewDocs)
+
+    if (user.targetRole) {
+      if (interviewStats.total === 0) {
+        add(5, 'Take your first mock interview', 'Practise with questions written for your profile and get scored feedback.', '/interview')
+      } else if (interviewStats.latest < 60 && interviewStats.weakTopics.length > 0) {
+        add(
+          4,
+          `Practise ${interviewStats.weakTopics[0].topic}`,
+          `Your latest interview scored ${interviewStats.latest}/100, and this is your weakest topic so far.`,
+          '/interview'
+        )
+      }
+    }
     const nextActions = actions
       .sort((a, b) => a.priority - b.priority)
       .slice(0, 4)
@@ -145,6 +166,12 @@ export const getDashboard = async (req, res) => {
         total: milestones.length,
         done: doneMilestones,
         next: nextMilestone ? nextMilestone.title : null,
+      },
+      interviews: {
+        total: interviewStats.total,
+        average: interviewStats.average,
+        latest: interviewStats.latest,
+        weakestTopic: interviewStats.weakTopics[0]?.topic || null,
       },
       nextActions,
     })
