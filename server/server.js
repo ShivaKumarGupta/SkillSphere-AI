@@ -18,6 +18,7 @@ import portfolioRoutes from './routes/portfolioRoutes.js'
 import { getPublicPortfolio } from './controllers/portfolioController.js'
 import fileRoutes from './routes/fileRoutes.js'
 import { getPublicFile } from './controllers/fileController.js'
+import analyticsRoutes from './routes/analyticsRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -47,6 +48,7 @@ app.use('/api/portfolio', portfolioRoutes)
 app.get('/api/public/portfolio/:slug', getPublicPortfolio)
 app.use('/api/files', fileRoutes)
 app.get('/api/public/portfolio/:slug/files/:id', getPublicFile)
+app.use('/api/analytics', analyticsRoutes)
 
 const PORT = process.env.PORT || 5000
 

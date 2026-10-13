@@ -249,12 +249,20 @@ export const analyzeResume = async (req, res) => {
     const saved = await ResumeAnalysis.findOneAndUpdate(
       { user: req.user._id },
       {
-        ...result,
-        hiddenInstructionsDetected: result.hiddenInstructionsDetected || looksLikeInjection(input.text),
-        targetRole: input.role,
-        fileName: input.fileName,
-        inputHash: hashInput(input),
-        model: aiInfo().model,
+        $set: {
+          ...result,
+          hiddenInstructionsDetected: result.hiddenInstructionsDetected || looksLikeInjection(input.text),
+          targetRole: input.role,
+          fileName: input.fileName,
+          inputHash: hashInput(input),
+          model: aiInfo().model,
+        },
+        $push: {
+          history: {
+            $each: [{ score: result.overallScore, at: new Date(), targetRole: input.role }],
+            $slice: -20,
+          },
+        },
       },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     )

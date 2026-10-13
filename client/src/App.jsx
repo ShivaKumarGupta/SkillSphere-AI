@@ -20,6 +20,7 @@ import Applications from './pages/Applications'
 import PlacementAnalytics from './pages/PlacementAnalytics'
 import Portfolio from './pages/Portfolio'
 import PublicPortfolio from './pages/PublicPortfolio'
+import Analytics from './pages/Analytics'
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
         <Route path="/applications" element={<Applications />} />
         <Route path="/applications/analytics" element={<PlacementAnalytics />} />
         <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/analytics" element={<Analytics />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

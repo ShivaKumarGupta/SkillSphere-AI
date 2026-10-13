@@ -9,6 +9,15 @@ const weakSectionSchema = new mongoose.Schema(
   { _id: false }
 )
 
+const historySchema = new mongoose.Schema(
+  {
+    score: { type: Number, required: true, min: 0, max: 100 },
+    at: { type: Date, default: Date.now },
+    targetRole: { type: String, trim: true, maxlength: 100, default: '' },
+  },
+  { _id: false }
+)
+
 const list = [{ type: String, trim: true, maxlength: 300 }]
 
 const resumeAnalysisSchema = new mongoose.Schema(
@@ -32,6 +41,7 @@ const resumeAnalysisSchema = new mongoose.Schema(
     hiddenInstructionsDetected: { type: Boolean, default: false },
     inputHash: { type: String, required: true },
     model: { type: String, trim: true, maxlength: 60, default: '' },
+    history: [historySchema],
   },
   { timestamps: true }
 )

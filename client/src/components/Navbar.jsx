@@ -53,6 +53,9 @@ export default function Navbar() {
           <NavLink to="/portfolio" className={linkClass}>
           Portfolio
           </NavLink>
+          <NavLink to="/analytics" className={linkClass}>
+          Analytics
+          </NavLink>
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-slate-500 sm:block">{user.name}</span>
