@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Project from '../models/Project.js'
+import File from '../models/File.js'
 
 const STATUSES = ['Planned', 'In Progress', 'Completed']
 
@@ -112,6 +113,7 @@ export const deleteProject = async (req, res) => {
     })
 
     if (!project) return res.status(404).json({ message: 'Project not found' })
+    await File.deleteMany({ user: req.user._id, owner: project._id })
     res.json({ message: 'Project deleted' })
   } catch (error) {
     console.error(error)

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import useAuth from '../hooks/useAuth'
+import useFiles from '../hooks/useFiles'
+import FilePanel from '../components/FilePanel'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500'
@@ -28,6 +30,7 @@ export default function Certificates() {
   const [editingId, setEditingId] = useState(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const { add, remove, forOwner } = useFiles()
 
   useEffect(() => {
     api
@@ -248,6 +251,13 @@ export default function Certificates() {
                 </a>
               )}
 
+              <FilePanel
+                kind="certificate"
+                ownerId={c._id}
+                files={forOwner('certificate', c._id)}
+                onAdded={add}
+                onRemoved={remove}
+              />
               <div className="mt-auto flex gap-3 pt-4 text-sm">
                 <button onClick={() => openEdit(c)} className="text-slate-600 hover:text-indigo-600">
                   Edit

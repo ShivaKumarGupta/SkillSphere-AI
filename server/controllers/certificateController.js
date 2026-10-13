@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Certificate from '../models/Certificate.js'
+import File from '../models/File.js'
 
 const isHttpUrl = (value) => {
   try {
@@ -99,6 +100,7 @@ export const deleteCertificate = async (req, res) => {
     })
 
     if (!certificate) return res.status(404).json({ message: 'Certificate not found' })
+    await File.deleteMany({ user: req.user._id, owner: certificate._id })
     res.json({ message: 'Certificate deleted' })
   } catch (error) {
     console.error(error)

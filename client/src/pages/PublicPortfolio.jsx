@@ -152,6 +152,23 @@ export default function PublicPortfolio() {
                       ))}
                     </div>
                   )}
+                {p.screenshots.length > 0 && (
+                    <div className="mt-3 grid grid-cols-3 gap-2">
+                      {p.screenshots.map((id) => {
+                        const src = `/api/public/portfolio/${encodeURIComponent(slug)}/files/${id}`
+                        return (
+                          <a key={id} href={src} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={src}
+                              alt={`${p.name} screenshot`}
+                              loading="lazy"
+                              className="h-20 w-full rounded-lg border border-slate-200 object-cover"
+                            />
+                          </a>
+                        )
+                      })}
+                    </div>
+                  )}
                   <div className="mt-auto flex gap-4 pt-4 text-sm">
                     {p.githubUrl && <ExternalLink href={p.githubUrl}>Code</ExternalLink>}
                     {p.liveUrl && <ExternalLink href={p.liveUrl}>Live demo</ExternalLink>}
@@ -174,9 +191,16 @@ export default function PublicPortfolio() {
                       {c.relatedSkill && ` · ${c.relatedSkill}`}
                     </p>
                   </div>
-                  {c.credentialUrl && (
-                    <span className="text-sm">
-                      <ExternalLink href={c.credentialUrl}>Verify</ExternalLink>
+                    {(c.credentialUrl || c.fileId) && (
+                    <span className="flex gap-4 text-sm">
+                      {c.fileId && (
+                        <ExternalLink
+                          href={`/api/public/portfolio/${encodeURIComponent(slug)}/files/${c.fileId}`}
+                        >
+                          View file
+                        </ExternalLink>
+                      )}
+                      {c.credentialUrl && <ExternalLink href={c.credentialUrl}>Verify</ExternalLink>}
                     </span>
                   )}
                 </div>

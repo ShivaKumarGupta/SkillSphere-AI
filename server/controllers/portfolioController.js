@@ -2,6 +2,7 @@ import Portfolio, { RESERVED_SLUGS } from '../models/Portfolio.js'
 import User from '../models/User.js'
 import Project from '../models/Project.js'
 import Certificate from '../models/Certificate.js'
+import File from '../models/File.js'
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const BOOLEANS = ['isPublic', 'showEmail', 'showEducation', 'showSkills', 'showProjects', 'showCertificates']
@@ -138,6 +139,15 @@ export const getPublicPortfolio = async (req, res) => {
         : [],
     ])
     if (!user) return notFound()
+    const ownerIds = [...projects.map((p) => p._id), ...certificates.map((c) => c._id)]
+    const files = ownerIds.length
+      ? await File.find({ user: portfolio.user, owner: { $in: ownerIds } })
+          .select('kind owner')
+          .sort({ createdAt: 1 })
+          .lean()
+      : []
+    const filesOf = (kind, id) =>
+      files.filter((f) => f.kind === kind && String(f.owner) === String(id)).map((f) => String(f._id))
 
     // The response is built field by field, so nothing private can leak by accident
     res.json({
@@ -167,6 +177,7 @@ export const getPublicPortfolio = async (req, res) => {
         status: p.status,
         githubUrl: toUrl(p.githubUrl),
         liveUrl: toUrl(p.liveUrl),
+        screenshots: filesOf('project', p._id),
       })),
       certificates: certificates.map((c) => ({
         name: c.name,
@@ -174,6 +185,7 @@ export const getPublicPortfolio = async (req, res) => {
         year: new Date(c.issueDate).getUTCFullYear(),
         relatedSkill: c.relatedSkill || '',
         credentialUrl: toUrl(c.credentialUrl),
+        fileId: filesOf('certificate', c._id)[0] || null,
       })),
     })
   } catch (error) {
