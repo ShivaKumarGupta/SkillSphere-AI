@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import { STATUSES, ACTIVE_STATUSES, STATUS_STYLES } from '../constants/placement'
 import { todayKey, toLocalInput } from '../utils/date'
+import { Link } from 'react-router-dom'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500'
@@ -199,13 +200,21 @@ export default function Applications() {
           <h1 className="text-2xl font-bold text-slate-800">Placement Tracker</h1>
           <p className="mt-1 text-slate-500">Every company, stage and interview in one place.</p>
         </div>
-        {!editingId && (
-          <button
-            onClick={openNew}
-            className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700"
-          >
-            + Add application
-          </button>
+                {!editingId && (
+          <div className="flex gap-3">
+            <Link
+              to="/applications/analytics"
+              className="rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+            >
+              View analytics
+            </Link>
+            <button
+              onClick={openNew}
+              className="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700"
+            >
+              + Add application
+            </button>
+          </div>
         )}
       </div>
 

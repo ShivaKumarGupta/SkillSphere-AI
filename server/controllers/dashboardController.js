@@ -7,6 +7,7 @@ import Roadmap from '../models/Roadmap.js'
 import InterviewSession from '../models/InterviewSession.js'
 import { buildInterviewStats, INTERVIEW_STATS_FIELDS } from '../utils/interviewStats.js'
 import Application from '../models/Application.js'
+import ResumeAnalysis from '../models/ResumeAnalysis.js'
 
 const ratio = (value, target) => (target > 0 ? Math.min(1, value / target) : 0)
 const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase()
@@ -16,7 +17,7 @@ export const getDashboard = async (req, res) => {
     const user = req.user
     const todayKey = parseTodayKey(req.query.today)
 
-    const [projects, certificates, problems, roadmapDoc, interviewDocs, applicationDocs] =
+    const [projects, certificates, problems, roadmapDoc, interviewDocs, applicationDocs, analysisDoc] =
       await Promise.all([
         Project.find({ user: user._id }).select('name technologies status').lean(),
         Certificate.find({ user: user._id }).select('relatedSkill').lean(),
@@ -28,6 +29,7 @@ export const getDashboard = async (req, res) => {
           .limit(50)
           .lean(),
         Application.find({ user: user._id }).select('company status interviews').lean(),
+        ResumeAnalysis.findOne({ user: user._id }).select('overallScore').lean(),
       ])
 
     const profile = getProfileCompletion(user)
@@ -46,17 +48,33 @@ export const getDashboard = async (req, res) => {
     for (const p of projects) byStatus[p.status] += 1
 
     // Overall readiness: each area has a weight, and the weights add up to 100
+    const interviewStats = buildInterviewStats(interviewDocs)
+    const appliedCount = applicationDocs.filter((a) => a.status !== 'Saved').length
+
     const areas = [
-      { key: 'profile', label: 'Profile', weight: 25, score: profile.percentage / 100 },
-      { key: 'skills', label: 'Skills with proof', weight: 15, score: ratio(provenSkills.length, skills.length) },
-      { key: 'projects', label: 'Completed projects', weight: 20, score: ratio(byStatus.Completed, 3) },
-      { key: 'certificates', label: 'Certificates', weight: 10, score: ratio(certificates.length, 3) },
+      { key: 'profile', label: 'Profile', weight: 15, score: profile.percentage / 100 },
+      { key: 'skills', label: 'Skills with proof', weight: 10, score: ratio(provenSkills.length, skills.length) },
+      { key: 'projects', label: 'Completed projects', weight: 15, score: ratio(byStatus.Completed, 3) },
+      { key: 'certificates', label: 'Certificates', weight: 5, score: ratio(certificates.length, 3) },
       {
         key: 'dsa',
         label: 'DSA practice',
-        weight: 30,
+        weight: 20,
         score: 0.7 * ratio(dsa.total, 100) + 0.3 * ratio(dsa.goal.solvedThisWeek, dsa.goal.weekly),
       },
+      {
+        key: 'resume',
+        label: 'Resume (AI review)',
+        weight: 15,
+        score: analysisDoc ? analysisDoc.overallScore / 100 : 0,
+      },
+      {
+        key: 'interviews',
+        label: 'Mock interviews',
+        weight: 12,
+        score: interviewStats.total > 0 ? interviewStats.average / 100 : 0,
+      },
+      { key: 'applications', label: 'Applications', weight: 8, score: ratio(appliedCount, 5) },
     ]
 
     const readiness = {
@@ -128,7 +146,7 @@ export const getDashboard = async (req, res) => {
       }
     }
 
-        const milestones = roadmapDoc?.milestones || []
+    const milestones = roadmapDoc?.milestones || []
     const doneMilestones = milestones.filter((m) => m.completed).length
     const nextMilestone = milestones.find((m) => !m.completed)
 
@@ -139,7 +157,6 @@ export const getDashboard = async (req, res) => {
     } else if (nextMilestone) {
       add(4, `Next milestone: ${nextMilestone.title}`, `${doneMilestones} of ${milestones.length} roadmap milestones done.`, '/roadmap')
     }
-    const interviewStats = buildInterviewStats(interviewDocs)
 
     if (user.targetRole) {
       if (interviewStats.total === 0) {
@@ -180,6 +197,9 @@ export const getDashboard = async (req, res) => {
     if (applicationDocs.length === 0 && user.targetRole) {
       add(6, 'Track your first application', 'Keep every company, stage and interview date in one place.', '/applications')
     }
+    if (!analysisDoc && user.targetRole) {
+      add(5, 'Get your resume reviewed by AI', 'Upload your resume and see your score, skill gaps and missing keywords.', '/resume/analysis')
+    }
     const nextActions = actions
       .sort((a, b) => a.priority - b.priority)
       .slice(0, 4)
@@ -211,6 +231,7 @@ export const getDashboard = async (req, res) => {
           ? { company: nextInterview.company, round: nextInterview.round, date: nextInterview.date }
           : null,
       },
+      resume: { score: analysisDoc ? analysisDoc.overallScore : null },
       nextActions,
     })
   } catch (error) {

@@ -20,19 +20,6 @@ function StatCard({ to, label, value, hint }) {
     </Link>
   )
 }
-
-function ComingSoon({ title, text }) {
-  return (
-    <div className="rounded-2xl border-2 border-dashed border-slate-300 p-5">
-      <p className="font-medium text-slate-600">{title}</p>
-      <p className="mt-1 text-sm text-slate-400">{text}</p>
-      <span className="mt-3 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">
-        Coming soon
-      </span>
-    </div>
-  )
-}
-
 export default function Dashboard() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
@@ -48,7 +35,7 @@ export default function Dashboard() {
   if (error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
   if (!data) return <p className="text-slate-500">Loading your dashboard...</p>
 
-  const { readiness, skills, projects, certificates, dsa, roadmap, interviews, applications, nextActions } = data
+  const { readiness, skills, projects, certificates, dsa, roadmap, interviews, applications, resume, nextActions } = data
 
   return (
     <div className="space-y-6">
@@ -216,7 +203,25 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <ComingSoon title="Resume" text="Build and analyse your resume" />
+                <Link
+          to="/resume/analysis"
+          className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"
+        >
+          <p className="font-medium text-slate-800">Resume</p>
+          {resume.score === null ? (
+            <p className="mt-1 text-sm text-slate-500">
+              Upload your resume and get an AI review against your target role.
+            </p>
+          ) : (
+            <>
+              <p className="mt-1 text-3xl font-bold text-indigo-600">
+                {resume.score}
+                <span className="text-sm font-medium text-slate-400"> / 100 AI score</span>
+              </p>
+              <p className="mt-1 text-xs text-slate-400">Open the analyzer to see what to improve</p>
+            </>
+          )}
+        </Link>
         <Link
           to={interviews.total > 0 ? '/interview/analytics' : '/interview'}
           className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"

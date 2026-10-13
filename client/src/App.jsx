@@ -17,6 +17,7 @@ import Assistant from './pages/Assistant'
 import Interview from './pages/Interview'
 import InterviewAnalytics from './pages/InterviewAnalytics'
 import Applications from './pages/Applications'
+import PlacementAnalytics from './pages/PlacementAnalytics'
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/interview" element={<Interview />} />
         <Route path="/interview/analytics" element={<InterviewAnalytics />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/applications/analytics" element={<PlacementAnalytics />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
