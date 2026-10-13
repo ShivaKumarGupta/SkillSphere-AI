@@ -6,6 +6,7 @@ import { getProfileCompletion } from '../utils/profileCompletion.js'
 import Roadmap from '../models/Roadmap.js'
 import InterviewSession from '../models/InterviewSession.js'
 import { buildInterviewStats, INTERVIEW_STATS_FIELDS } from '../utils/interviewStats.js'
+import Application from '../models/Application.js'
 
 const ratio = (value, target) => (target > 0 ? Math.min(1, value / target) : 0)
 const same = (a, b) => String(a || '').toLowerCase() === String(b || '').toLowerCase()
@@ -15,17 +16,19 @@ export const getDashboard = async (req, res) => {
     const user = req.user
     const todayKey = parseTodayKey(req.query.today)
 
-    const [projects, certificates, problems, roadmapDoc, interviewDocs] = await Promise.all([
-      Project.find({ user: user._id }).select('name technologies status').lean(),
-      Certificate.find({ user: user._id }).select('relatedSkill').lean(),
-      DsaProblem.find({ user: user._id }).select('solvedDate difficulty topic').lean(),
-      Roadmap.findOne({ user: user._id }).select('milestones').lean(),
-      InterviewSession.find({ user: user._id, status: 'completed' })
-        .select(INTERVIEW_STATS_FIELDS)
-        .sort({ completedAt: -1 })
-        .limit(50)
-        .lean(),
-    ])
+    const [projects, certificates, problems, roadmapDoc, interviewDocs, applicationDocs] =
+      await Promise.all([
+        Project.find({ user: user._id }).select('name technologies status').lean(),
+        Certificate.find({ user: user._id }).select('relatedSkill').lean(),
+        DsaProblem.find({ user: user._id }).select('solvedDate difficulty topic').lean(),
+        Roadmap.findOne({ user: user._id }).select('milestones').lean(),
+        InterviewSession.find({ user: user._id, status: 'completed' })
+          .select(INTERVIEW_STATS_FIELDS)
+          .sort({ completedAt: -1 })
+          .limit(50)
+          .lean(),
+        Application.find({ user: user._id }).select('company status interviews').lean(),
+      ])
 
     const profile = getProfileCompletion(user)
     const dsa = buildDsaStats(problems, todayKey, user.dsaWeeklyGoal)
@@ -150,6 +153,33 @@ export const getDashboard = async (req, res) => {
         )
       }
     }
+    const ACTIVE = ['Applied', 'Online Assessment', 'Technical Interview', 'HR Interview']
+    const now = Date.now()
+
+    const upcoming = applicationDocs
+      .filter((a) => ACTIVE.includes(a.status))
+      .flatMap((a) =>
+        (a.interviews || []).map((iv) => ({ company: a.company, round: iv.round, date: iv.date }))
+      )
+      .filter((iv) => iv.date.getTime() > now)
+      .sort((a, b) => a.date - b.date)
+    const nextInterview = upcoming[0] || null
+
+    if (nextInterview) {
+      const days = Math.ceil((nextInterview.date.getTime() - now) / 86400000)
+      if (days <= 7) {
+        add(
+          1,
+          `Prepare for your ${nextInterview.round} at ${nextInterview.company}`,
+          `It is ${days <= 1 ? 'in the next 24 hours' : `in ${days} days`}. Practise with a mock interview or ask the assistant for likely questions.`,
+          '/interview'
+        )
+      }
+    }
+
+    if (applicationDocs.length === 0 && user.targetRole) {
+      add(6, 'Track your first application', 'Keep every company, stage and interview date in one place.', '/applications')
+    }
     const nextActions = actions
       .sort((a, b) => a.priority - b.priority)
       .slice(0, 4)
@@ -172,6 +202,14 @@ export const getDashboard = async (req, res) => {
         average: interviewStats.average,
         latest: interviewStats.latest,
         weakestTopic: interviewStats.weakTopics[0]?.topic || null,
+      },
+      applications: {
+        total: applicationDocs.length,
+        active: applicationDocs.filter((a) => ACTIVE.includes(a.status)).length,
+        selected: applicationDocs.filter((a) => a.status === 'Selected').length,
+        nextInterview: nextInterview
+          ? { company: nextInterview.company, round: nextInterview.round, date: nextInterview.date }
+          : null,
       },
       nextActions,
     })

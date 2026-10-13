@@ -16,6 +16,7 @@ import Roadmap from './pages/Roadmap'
 import Assistant from './pages/Assistant'
 import Interview from './pages/Interview'
 import InterviewAnalytics from './pages/InterviewAnalytics'
+import Applications from './pages/Applications'
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/interview" element={<Interview />} />
         <Route path="/interview/analytics" element={<InterviewAnalytics />} />
+        <Route path="/applications" element={<Applications />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

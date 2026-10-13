@@ -13,6 +13,7 @@ import aiRoutes from './routes/aiRoutes.js'
 import roadmapRoutes from './routes/roadmapRoutes.js'
 import assistantRoutes from './routes/assistantRoutes.js'
 import interviewRoutes from './routes/interviewRoutes.js'
+import applicationRoutes from './routes/applicationRoutes.js'
 
 dotenv.config()
 connectDB()
@@ -37,6 +38,7 @@ app.use('/api/ai', aiRoutes)
 app.use('/api/roadmap', roadmapRoutes)
 app.use('/api/assistant', assistantRoutes)
 app.use('/api/interviews', interviewRoutes)
+app.use('/api/applications', applicationRoutes)
 
 const PORT = process.env.PORT || 5000
 

@@ -48,7 +48,7 @@ export default function Dashboard() {
   if (error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
   if (!data) return <p className="text-slate-500">Loading your dashboard...</p>
 
-  const { readiness, skills, projects, certificates, dsa, roadmap, interviews, nextActions } = data
+  const { readiness, skills, projects, certificates, dsa, roadmap, interviews, applications, nextActions } = data
 
   return (
     <div className="space-y-6">
@@ -240,7 +240,28 @@ export default function Dashboard() {
             </>
           )}
         </Link>
-        <ComingSoon title="Applications" text="Track every company you apply to" />
+                <Link
+          to="/applications"
+          className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"
+        >
+          <p className="font-medium text-slate-800">Applications</p>
+          {applications.total === 0 ? (
+            <p className="mt-1 text-sm text-slate-500">
+              Track every company you apply to, from Applied to Selected.
+            </p>
+          ) : (
+            <>
+              <p className="mt-1 text-3xl font-bold text-indigo-600">
+                {applications.active}
+                <span className="text-sm font-medium text-slate-400"> active</span>
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                {applications.total} tracked · {applications.selected} selected
+                {applications.nextInterview ? ` · next: ${applications.nextInterview.company}` : ''}
+              </p>
+            </>
+          )}
+        </Link>
       </div>
     </div>
   )

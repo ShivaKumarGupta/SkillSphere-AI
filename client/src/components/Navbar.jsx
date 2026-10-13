@@ -47,6 +47,9 @@ export default function Navbar() {
           <NavLink to="/resume" className={linkClass}>
              Resume
           </NavLink>
+          <NavLink to="/applications" className={linkClass}>
+           Applications
+          </NavLink>
         </div>
         <div className="flex items-center gap-3">
           <span className="hidden text-sm text-slate-500 sm:block">{user.name}</span>
