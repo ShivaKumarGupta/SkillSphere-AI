@@ -14,6 +14,8 @@ import roadmapRoutes from './routes/roadmapRoutes.js'
 import assistantRoutes from './routes/assistantRoutes.js'
 import interviewRoutes from './routes/interviewRoutes.js'
 import applicationRoutes from './routes/applicationRoutes.js'
+import portfolioRoutes from './routes/portfolioRoutes.js'
+import { getPublicPortfolio } from './controllers/portfolioController.js'
 
 dotenv.config()
 connectDB()
@@ -39,6 +41,8 @@ app.use('/api/roadmap', roadmapRoutes)
 app.use('/api/assistant', assistantRoutes)
 app.use('/api/interviews', interviewRoutes)
 app.use('/api/applications', applicationRoutes)
+app.use('/api/portfolio', portfolioRoutes)
+app.get('/api/public/portfolio/:slug', getPublicPortfolio)
 
 const PORT = process.env.PORT || 5000
 

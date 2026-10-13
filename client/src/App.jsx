@@ -18,12 +18,15 @@ import Interview from './pages/Interview'
 import InterviewAnalytics from './pages/InterviewAnalytics'
 import Applications from './pages/Applications'
 import PlacementAnalytics from './pages/PlacementAnalytics'
+import Portfolio from './pages/Portfolio'
+import PublicPortfolio from './pages/PublicPortfolio'
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/u/:slug" element={<PublicPortfolio />} />
       <Route
         element={
           <ProtectedRoute>
@@ -46,6 +49,7 @@ function App() {
         <Route path="/interview/analytics" element={<InterviewAnalytics />} />
         <Route path="/applications" element={<Applications />} />
         <Route path="/applications/analytics" element={<PlacementAnalytics />} />
+        <Route path="/portfolio" element={<Portfolio />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>
