@@ -129,7 +129,7 @@ export default function InterviewAnalytics() {
               <Line
                 type="monotone"
                 dataKey="score"
-                stroke="#4f46e5"
+                stroke="#2A7F8E"
                 strokeWidth={2}
                 dot={{ r: 4 }}
               />

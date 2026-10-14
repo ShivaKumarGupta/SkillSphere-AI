@@ -64,7 +64,7 @@ export default function ResumeDocument({ resume }) {
 
   return (
     <div
-      className="mx-auto w-full max-w-[210mm] bg-white p-8 text-[10pt] leading-snug text-black shadow print:max-w-none print:p-0 print:shadow-none"
+      className="resume-doc mx-auto w-full max-w-[210mm] bg-white p-8 text-[10pt] leading-snug text-black shadow print:max-w-none print:p-0 print:shadow-none"
       style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}
     >
       <header className="text-center">

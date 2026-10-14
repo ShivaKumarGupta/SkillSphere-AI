@@ -31,7 +31,7 @@ export const TOPICS = [
 
 export const DIFFICULTY_COLORS = {
   Easy: '#22c55e',
-  Medium: '#f59e0b',
+  Medium: '#F2A541',
   Hard: '#ef4444',
 }
 

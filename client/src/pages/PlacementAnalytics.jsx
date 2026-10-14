@@ -215,7 +215,7 @@ export default function PlacementAnalytics() {
               <XAxis dataKey="label" tick={{ fontSize: 12 }} />
               <YAxis allowDecimals={false} width={30} tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Bar dataKey="count" name="Applications" fill="#4f46e5" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" name="Applications" fill="#2A7F8E" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

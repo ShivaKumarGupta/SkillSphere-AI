@@ -1,4 +1,85 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Sora", "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+
+  /* Trail theme. These redefine Tailwind's own colour names, so every existing page picks them up. */
+
+  /* Brand: deep teal and lake (was indigo) */
+  --color-indigo-50: #eaf4f5;
+  --color-indigo-100: #d3e8eb;
+  --color-indigo-200: #a9d1d7;
+  --color-indigo-300: #7db8c1;
+  --color-indigo-400: #4e9daa;
+  --color-indigo-500: #348c9b;
+  --color-indigo-600: #2a7f8e;
+  --color-indigo-700: #1f6573;
+  --color-indigo-800: #164d5a;
+  --color-indigo-900: #0b3c49;
+  --color-indigo-950: #082b35;
+
+  /* Neutrals: mist and teal-tinted greys (was slate) */
+  --color-slate-50: #f3f8f8;
+  --color-slate-100: #eaf2f3;
+  --color-slate-200: #d5e2e4;
+  --color-slate-300: #b8cbce;
+  --color-slate-400: #7f989e;
+  --color-slate-500: #5a7279;
+  --color-slate-600: #475d63;
+  --color-slate-700: #36494f;
+  --color-slate-800: #1f2f34;
+  --color-slate-900: #121e22;
+  --color-slate-950: #0a1316;
+
+  /* Marigold: highlights, warnings and "in progress" (was amber) */
+  --color-amber-50: #fef6e7;
+  --color-amber-100: #fcebc8;
+  --color-amber-200: #f9d793;
+  --color-amber-300: #f5c165;
+  --color-amber-400: #f2a541;
+  --color-amber-500: #e08e1f;
+  --color-amber-600: #c2740f;
+  --color-amber-700: #9a5a0c;
+  --color-amber-800: #7a470d;
+  --color-amber-900: #5f3810;
+  --color-amber-950: #371e05;
+
+  /* Plum: HR interviews and secondary accents (was purple) */
+  --color-purple-50: #f6f0f9;
+  --color-purple-100: #ebdff1;
+  --color-purple-200: #d8c0e3;
+  --color-purple-300: #bb97d0;
+  --color-purple-400: #9c6db8;
+  --color-purple-500: #7d4f9a;
+  --color-purple-600: #66417d;
+  --color-purple-700: #5b3a70;
+  --color-purple-800: #472c57;
+  --color-purple-900: #33203f;
+  --color-purple-950: #21142a;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* A visible focus ring for keyboard users on buttons, links and dropdowns */
+  :is(a, button, select, summary):focus-visible {
+    outline: 2px solid var(--color-amber-600);
+    outline-offset: 2px;
+  }
+}
+
+/* The resume must stay plain, so it opts out of the heading font */
+.resume-doc :is(h1, h2, h3) {
+  font-family: inherit;
+  letter-spacing: normal;
+}
+
 @media print {
   @page {
     size: A4;

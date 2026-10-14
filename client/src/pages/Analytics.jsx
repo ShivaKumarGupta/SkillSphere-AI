@@ -66,7 +66,7 @@ function ScoreLine({ data, emptyText }) {
               payload && payload[0] ? `${label} · ${payload[0].payload.date}` : label
             }
           />
-          <Line type="monotone" dataKey="score" stroke="#4f46e5" strokeWidth={2} dot={{ r: 4 }} />
+          <Line type="monotone" dataKey="score" stroke="#2A7F8E" strokeWidth={2} dot={{ r: 4 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -175,10 +175,10 @@ export default function Analytics() {
                 <YAxis allowDecimals={false} width={30} tick={{ fontSize: 12 }} />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="DSA problems" stackId="a" fill="#4f46e5" />
-                <Bar dataKey="Mock interviews" stackId="a" fill="#f59e0b" />
+                <Bar dataKey="DSA problems" stackId="a" fill="#2A7F8E" />
+                <Bar dataKey="Mock interviews" stackId="a" fill="#F2A541" />
                 <Bar dataKey="Roadmap milestones" stackId="a" fill="#22c55e" />
-                <Bar dataKey="Applications" stackId="a" fill="#0ea5e9" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Applications" stackId="a" fill="#5B3A70" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

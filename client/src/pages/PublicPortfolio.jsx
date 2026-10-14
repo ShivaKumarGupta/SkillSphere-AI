@@ -74,6 +74,13 @@ export default function PublicPortfolio() {
     )
   }
 
+  const initials = data.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
+
   const { education } = data
   const educationLine = education
     ? [[education.degree, education.branch].filter(Boolean).join(', '), education.college]
@@ -84,16 +91,54 @@ export default function PublicPortfolio() {
   return (
     <div className="min-h-screen bg-slate-100">
       <div className="mx-auto max-w-3xl px-4 py-12">
-        <header className="rounded-2xl bg-white p-8 shadow">
-          <h1 className="text-3xl font-bold text-slate-900">{data.name}</h1>
-          {data.targetRole && <p className="mt-1 text-indigo-600">{data.targetRole}</p>}
-          {data.headline && <p className="mt-3 text-slate-700">{data.headline}</p>}
-          {data.bio && <p className="mt-3 whitespace-pre-wrap break-words text-sm text-slate-600">{data.bio}</p>}
+        <header className="rounded-3xl bg-indigo-900 p-8 text-white shadow sm:p-10">
+          <div className="flex flex-wrap items-center gap-5">
+            <span
+              aria-hidden="true"
+              className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-amber-400 font-display text-2xl font-bold text-indigo-900"
+            >
+              {initials}
+            </span>
+            <div className="min-w-0">
+              <h1 className="break-words text-3xl font-bold">{data.name}</h1>
+              {data.targetRole && <p className="mt-1 text-amber-300">{data.targetRole}</p>}
+            </div>
+          </div>
 
-          <div className="mt-5 flex flex-wrap gap-5 text-sm">
-            {data.links.github && <ExternalLink href={data.links.github}>GitHub</ExternalLink>}
-            {data.links.linkedin && <ExternalLink href={data.links.linkedin}>LinkedIn</ExternalLink>}
-            {data.email && <ExternalLink href={`mailto:${data.email}`}>{data.email}</ExternalLink>}
+          {data.headline && <p className="mt-5 text-lg text-slate-100">{data.headline}</p>}
+          {data.bio && (
+            <p className="mt-3 whitespace-pre-wrap break-words text-slate-200">{data.bio}</p>
+          )}
+
+          <div className="mt-6 flex flex-wrap gap-3 text-sm">
+            {data.links.github && (
+              <a
+                href={data.links.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+              >
+                GitHub
+              </a>
+            )}
+            {data.links.linkedin && (
+              <a
+                href={data.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+              >
+                LinkedIn
+              </a>
+            )}
+            {data.email && (
+              <a
+                href={`mailto:${data.email}`}
+                className="rounded-full bg-white/10 px-4 py-2 text-white hover:bg-white/20"
+              >
+                {data.email}
+              </a>
+            )}
           </div>
         </header>
 

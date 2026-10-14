@@ -11,15 +11,59 @@ const readinessLabel = (pct) => {
   return 'Placement ready'
 }
 
-function StatCard({ to, label, value, hint }) {
+// The ring fills once when the page opens
+function Ring({ value }) {
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setShown(true), 60)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const radius = 52
+  const circumference = 2 * Math.PI * radius
+  const offset = circumference * (1 - (shown ? value : 0) / 100)
+
   return (
-    <Link to={to} className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md">
+    <div className="relative h-44 w-44">
+      <svg
+        viewBox="0 0 120 120"
+        className="h-full w-full -rotate-90"
+        role="img"
+        aria-label={`Career readiness ${value} percent`}
+      >
+        <circle cx="60" cy="60" r={radius} fill="none" strokeWidth="10" className="stroke-slate-200" />
+        <circle
+          cx="60"
+          cy="60"
+          r={radius}
+          fill="none"
+          strokeWidth="10"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          className="stroke-indigo-600 transition-[stroke-dashoffset] duration-1000 ease-out motion-reduce:transition-none"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-display text-4xl font-bold text-indigo-900">{value}%</span>
+      </div>
+    </div>
+  )
+}
+
+function Tile({ to, label, value, hint }) {
+  return (
+    <Link
+      to={to}
+      className="rounded-2xl bg-white p-5 shadow ring-1 ring-transparent transition-colors hover:ring-indigo-300"
+    >
       <p className="text-sm text-slate-500">{label}</p>
-      <p className="mt-1 text-3xl font-bold text-slate-800">{value}</p>
-      <p className="mt-1 text-xs text-slate-400">{hint}</p>
+      <p className="mt-1 font-display text-2xl font-bold text-slate-800">{value}</p>
+      {hint && <p className="mt-1 truncate text-xs text-slate-400">{hint}</p>}
     </Link>
   )
 }
+
 export default function Dashboard() {
   const { user } = useAuth()
   const [data, setData] = useState(null)
@@ -37,131 +81,136 @@ export default function Dashboard() {
 
   const { readiness, skills, projects, certificates, dsa, roadmap, interviews, applications, resume, nextActions } = data
 
+  const first = nextActions[0]
+  const rest = nextActions.slice(1)
+  const proven = skills.filter((s) => s.projects + s.certificates > 0).length
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Welcome, {user.name} 👋</h1>
+        <h1 className="text-2xl font-bold text-slate-800">Welcome, {user.name}</h1>
         <p className="mt-1 text-slate-500">
           {user.targetRole
             ? `Target role: ${user.targetRole}`
-            : 'Set a target role in your profile to personalise your journey'}
+            : 'Set a target role in your profile to personalise your trail'}
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-5">
-        <div className="rounded-2xl bg-white p-6 shadow lg:col-span-2">
-          <p className="text-sm text-slate-500">Career readiness</p>
-          <p className="mt-1 text-5xl font-bold text-indigo-600">{readiness.percentage}%</p>
-          <p className="mt-1 text-sm font-medium text-slate-600">
+      <section className="grid gap-8 rounded-3xl bg-white p-6 shadow lg:grid-cols-[auto_1fr] lg:p-8">
+        <div className="flex flex-col items-center justify-center">
+          <Ring value={readiness.percentage} />
+          <p className="mt-3 font-display font-semibold text-indigo-900">
             {readinessLabel(readiness.percentage)}
           </p>
-
-          <div className="mt-5 space-y-3">
-            {readiness.areas.map((a) => (
-              <div key={a.key}>
-                <div className="flex justify-between text-xs text-slate-500">
-                  <span>{a.label}</span>
-                  <span>{a.percentage}%</span>
-                </div>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
-                  <div
-                    className="h-full rounded-full bg-indigo-500 transition-all"
-                    style={{ width: `${a.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+          <p className="text-sm text-slate-500">Career readiness</p>
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow lg:col-span-3">
-          <h2 className="font-semibold text-slate-800">What to work on next</h2>
-          {nextActions.length === 0 ? (
-            <p className="mt-4 text-sm text-green-600">
-              🎉 You are on top of everything right now. Keep your streak going!
+        <div>
+          <h2 className="text-lg font-semibold text-slate-800">What to work on next</h2>
+
+          {!first ? (
+            <p className="mt-4 text-sm text-green-700">
+              You are on top of everything right now. Keep your streak going.
             </p>
           ) : (
-            <ol className="mt-4 space-y-3">
-              {nextActions.map((a, i) => (
-                <li key={a.title} className="flex gap-3 rounded-xl bg-slate-50 p-4">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-sm font-semibold text-white">
-                    {i + 1}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-800">{a.title}</p>
-                    <p className="mt-0.5 text-sm text-slate-500">{a.detail}</p>
-                    <Link
-                      to={a.link}
-                      className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:underline"
-                    >
-                      Go there →
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ol>
+            <>
+              <div className="mt-4 rounded-xl border-l-4 border-amber-400 bg-amber-50 p-4">
+                <p className="font-semibold text-slate-800">{first.title}</p>
+                <p className="mt-1 text-sm text-slate-600">{first.detail}</p>
+                <Link
+                  to={first.link}
+                  className="mt-3 inline-block rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-800"
+                >
+                  Open
+                </Link>
+              </div>
+
+              {rest.length > 0 && (
+                <ul className="mt-4 divide-y divide-slate-100">
+                  {rest.map((a) => (
+                    <li key={a.title} className="flex items-start justify-between gap-4 py-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-slate-800">{a.title}</p>
+                        <p className="text-xs text-slate-500">{a.detail}</p>
+                      </div>
+                      <Link
+                        to={a.link}
+                        className="shrink-0 text-sm font-semibold text-indigo-700 hover:underline"
+                      >
+                        Open
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
           )}
         </div>
-      </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow">
+        <h2 className="font-semibold text-slate-800">What your readiness is made of</h2>
+        <div className="mt-4 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+          {readiness.areas.map((a) => (
+            <div key={a.key}>
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-700">{a.label}</span>
+                <span className="text-slate-500">{a.percentage}%</span>
+              </div>
+              <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-200">
+                <div className="h-full rounded-full bg-indigo-600" style={{ width: `${a.percentage}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          to="/projects"
-          label="Projects"
-          value={projects.total}
-          hint={`${projects.byStatus.Completed} completed`}
+        <Tile
+          to="/profile"
+          label="Skills with proof"
+          value={skills.length === 0 ? 'N/A' : `${proven} / ${skills.length}`}
+          hint="Backed by a project or certificate"
         />
-        <StatCard
-          to="/certificates"
-          label="Certificates"
-          value={certificates.total}
-          hint="Credentials earned"
+        <Tile to="/projects" label="Projects" value={projects.total} hint={`${projects.byStatus.Completed} completed`} />
+        <Tile to="/certificates" label="Certificates" value={certificates.total} hint="Credentials earned" />
+        <Tile to="/dsa" label="DSA solved" value={dsa.total} hint={`${dsa.streak.current}-day streak`} />
+        <Tile
+          to="/roadmap"
+          label="Roadmap"
+          value={roadmap.total === 0 ? 'Not started' : `${roadmap.done} / ${roadmap.total}`}
+          hint={roadmap.next ? `Next: ${roadmap.next}` : roadmap.total > 0 ? 'All milestones done' : 'Generate your trail'}
         />
-        <StatCard
-          to="/dsa"
-          label="DSA solved"
-          value={dsa.total}
-          hint={`${dsa.streak.current}-day streak`}
+        <Tile
+          to="/resume/analysis"
+          label="Resume AI score"
+          value={resume.score === null ? 'N/A' : resume.score}
+          hint={resume.score === null ? 'Not reviewed yet' : 'Out of 100'}
         />
-        <StatCard
-          to="/dsa"
-          label="This week"
-          value={`${dsa.goal.solvedThisWeek} / ${dsa.goal.weekly}`}
-          hint="Weekly DSA goal"
+        <Tile
+          to={interviews.total > 0 ? '/interview/analytics' : '/interview'}
+          label="Mock interviews"
+          value={interviews.total === 0 ? 'N/A' : `${interviews.average} avg`}
+          hint={interviews.total === 0 ? 'None taken yet' : `${interviews.total} completed`}
+        />
+        <Tile
+          to="/applications"
+          label="Applications"
+          value={applications.total === 0 ? 'N/A' : `${applications.active} active`}
+          hint={
+            applications.total === 0
+              ? 'None tracked yet'
+              : `${applications.total} tracked, ${applications.selected} selected`
+          }
         />
       </div>
 
-            <Link to="/roadmap" className="block rounded-2xl bg-white p-6 shadow transition hover:shadow-md">
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-slate-800">Career roadmap</h2>
-          <span className="text-sm text-indigo-600">Open →</span>
-        </div>
-        {roadmap.total === 0 ? (
-          <p className="mt-2 text-sm text-slate-500">
-            Generate a personalised step-by-step plan for your target role.
-          </p>
-        ) : (
-          <>
-            <p className="mt-2 text-sm text-slate-600">
-              {roadmap.done} of {roadmap.total} milestones done
-              {roadmap.next ? ` · Next: ${roadmap.next}` : ' · All done 🎉'}
-            </p>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-200">
-              <div
-                className="h-full rounded-full bg-indigo-600 transition-all"
-                style={{ width: `${Math.round((roadmap.done / roadmap.total) * 100)}%` }}
-              />
-            </div>
-          </>
-        )}
-      </Link>
-
-      <div className="rounded-2xl bg-white p-6 shadow">
+      <section className="rounded-2xl bg-white p-6 shadow">
         <h2 className="font-semibold text-slate-800">Your skills</h2>
         {skills.length === 0 ? (
           <p className="mt-3 text-sm text-slate-500">
             No skills yet.{' '}
-            <Link to="/profile" className="text-indigo-600 hover:underline">
+            <Link to="/profile" className="font-medium text-indigo-700 hover:underline">
               Add them in your profile
             </Link>
             .
@@ -170,11 +219,10 @@ export default function Dashboard() {
           <>
             <div className="mt-4 flex flex-wrap gap-2">
               {skills.map((s) => {
-                const proven = s.projects + s.certificates > 0
+                const isProven = s.projects + s.certificates > 0
                 const proof = [
                   s.projects > 0 && `${s.projects} ${s.projects === 1 ? 'project' : 'projects'}`,
-                  s.certificates > 0 &&
-                    `${s.certificates} ${s.certificates === 1 ? 'certificate' : 'certificates'}`,
+                  s.certificates > 0 && `${s.certificates} ${s.certificates === 1 ? 'certificate' : 'certificates'}`,
                 ]
                   .filter(Boolean)
                   .join(', ')
@@ -183,12 +231,12 @@ export default function Dashboard() {
                   <span
                     key={s.skill}
                     className={`rounded-full px-3 py-1.5 text-sm ${
-                      proven ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'
+                      isProven ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'
                     }`}
                   >
                     {s.skill}
                     <span className="ml-1.5 text-xs opacity-75">
-                      {proven ? `✓ ${proof}` : '· no proof yet'}
+                      {isProven ? `Proven by ${proof}` : 'No proof yet'}
                     </span>
                   </span>
                 )
@@ -200,74 +248,7 @@ export default function Dashboard() {
             </p>
           </>
         )}
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-                <Link
-          to="/resume/analysis"
-          className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"
-        >
-          <p className="font-medium text-slate-800">Resume</p>
-          {resume.score === null ? (
-            <p className="mt-1 text-sm text-slate-500">
-              Upload your resume and get an AI review against your target role.
-            </p>
-          ) : (
-            <>
-              <p className="mt-1 text-3xl font-bold text-indigo-600">
-                {resume.score}
-                <span className="text-sm font-medium text-slate-400"> / 100 AI score</span>
-              </p>
-              <p className="mt-1 text-xs text-slate-400">Open the analyzer to see what to improve</p>
-            </>
-          )}
-        </Link>
-        <Link
-          to={interviews.total > 0 ? '/interview/analytics' : '/interview'}
-          className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"
-        >
-          <p className="font-medium text-slate-800">Mock interviews</p>
-          {interviews.total === 0 ? (
-            <p className="mt-1 text-sm text-slate-500">
-              Practise with AI-written questions and get scored feedback.
-            </p>
-          ) : (
-            <>
-              <p className="mt-1 text-3xl font-bold text-indigo-600">
-                {interviews.average}
-                <span className="text-sm font-medium text-slate-400"> / 100 average</span>
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                {interviews.total} {interviews.total === 1 ? 'interview' : 'interviews'} · latest{' '}
-                {interviews.latest}
-                {interviews.weakestTopic ? ` · weakest: ${interviews.weakestTopic}` : ''}
-              </p>
-            </>
-          )}
-        </Link>
-                <Link
-          to="/applications"
-          className="rounded-2xl bg-white p-5 shadow transition hover:shadow-md"
-        >
-          <p className="font-medium text-slate-800">Applications</p>
-          {applications.total === 0 ? (
-            <p className="mt-1 text-sm text-slate-500">
-              Track every company you apply to, from Applied to Selected.
-            </p>
-          ) : (
-            <>
-              <p className="mt-1 text-3xl font-bold text-indigo-600">
-                {applications.active}
-                <span className="text-sm font-medium text-slate-400"> active</span>
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                {applications.total} tracked · {applications.selected} selected
-                {applications.nextInterview ? ` · next: ${applications.nextInterview.company}` : ''}
-              </p>
-            </>
-          )}
-        </Link>
-      </div>
+      </section>
     </div>
   )
 }

@@ -1,15 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import api from '../api/axios'
+import RoadmapTrail from '../components/RoadmapTrail'
 
-const CATEGORY_STYLES = {
-  Skills: 'bg-indigo-100 text-indigo-700',
-  Projects: 'bg-green-100 text-green-700',
-  DSA: 'bg-amber-100 text-amber-700',
-  Certification: 'bg-sky-100 text-sky-700',
-  Resume: 'bg-pink-100 text-pink-700',
-  'Interview Prep': 'bg-purple-100 text-purple-700',
-}
+
 
 const formatDateTime = (iso) =>
   new Date(iso).toLocaleString('en-IN', {
@@ -152,78 +146,13 @@ export default function Roadmap() {
           </div>
 
           <ol className="space-y-4">
-            {roadmap.milestones.map((m, i) => (
-              <li
-                key={m.id}
-                className={`rounded-2xl bg-white p-5 shadow ${
-                  m.id === nextId ? 'ring-2 ring-indigo-400' : ''
-                } ${m.completed ? 'opacity-70' : ''}`}
-              >
-                <div className="flex gap-4">
-                  <span
-                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      m.completed ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-600'
-                    }`}
-                  >
-                    {m.completed ? '✓' : i + 1}
-                  </span>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3
-                        className={`font-semibold text-slate-800 ${
-                          m.completed ? 'line-through' : ''
-                        }`}
-                      >
-                        {m.title}
-                      </h3>
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                          CATEGORY_STYLES[m.category] || 'bg-slate-100 text-slate-600'
-                        }`}
-                      >
-                        {m.category}
-                      </span>
-                      {m.id === nextId && (
-                        <span className="rounded-full bg-indigo-600 px-2.5 py-0.5 text-xs font-medium text-white">
-                          Up next
-                        </span>
-                      )}
-                    </div>
-
-                    <p className="mt-1 text-xs text-slate-400">
-                      About {m.estimatedWeeks} {m.estimatedWeeks === 1 ? 'week' : 'weeks'}
-                    </p>
-                    {m.description && <p className="mt-2 text-sm text-slate-600">{m.description}</p>}
-
-                    {m.topics.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {m.topics.map((t, j) => (
-                          <span
-                            key={j}
-                            className="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-600"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => toggle(m)}
-                      disabled={togglingId === m.id}
-                      className="mt-4 text-sm font-medium text-indigo-600 hover:underline disabled:opacity-60"
-                    >
-                      {togglingId === m.id
-                        ? 'Saving...'
-                        : m.completed
-                          ? 'Mark as not done'
-                          : 'Mark as done'}
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
+            <RoadmapTrail
+            milestones={roadmap.milestones}
+            nextId={nextId}
+            togglingId={togglingId}
+            onToggle={toggle}
+            targetRole={roadmap.targetRole}
+          />
           </ol>
 
           <p className="text-xs text-slate-400">
