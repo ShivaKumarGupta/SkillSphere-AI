@@ -9,8 +9,8 @@ export const registerUser = async (req, res) => {
     if (![name, email, password].every((v) => typeof v === 'string' && v.trim())) {
       return res.status(400).json({ message: 'Please fill all fields' })
     }
-    if (password.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters' })
+    if (password.length < 8) {
+      return res.status(400).json({ message: 'Password must be at least 8 characters' })
     }
 
     const cleanEmail = email.toLowerCase().trim()

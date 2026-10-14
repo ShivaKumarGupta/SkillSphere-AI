@@ -58,7 +58,13 @@ export default function Navbar() {
           </NavLink>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-slate-500 sm:block">{user.name}</span>
+          <NavLink
+            to="/settings"
+            title="Account settings"
+            className="hidden text-sm text-slate-500 hover:text-indigo-600 sm:block"
+          >
+            {user.name}
+          </NavLink>
           <button
             onClick={handleLogout}
             className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-white hover:bg-slate-700"

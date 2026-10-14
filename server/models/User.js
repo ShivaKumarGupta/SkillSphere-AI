@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false,
     },
+    passwordChangedAt: { type: Date, default: null },
 
     // Profile fields
     college: { type: String, trim: true, maxlength: 100, default: '' },

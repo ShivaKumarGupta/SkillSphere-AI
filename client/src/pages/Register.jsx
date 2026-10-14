@@ -59,7 +59,7 @@ export default function Register() {
           value={form.password}
           onChange={handleChange}
           required
-          minLength={6}
+          minLength={8}
           className="mt-1 mb-6 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500"
         />
 
