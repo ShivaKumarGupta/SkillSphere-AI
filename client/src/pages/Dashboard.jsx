@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import api from '../api/axios'
 import useAuth from '../hooks/useAuth'
 import { todayKey } from '../utils/date'
+import PageSkeleton from '../components/PageSkeleton'
 
 const readinessLabel = (pct) => {
   if (pct < 30) return 'Just getting started'
@@ -77,7 +78,7 @@ export default function Dashboard() {
   }, [])
 
   if (error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
-  if (!data) return <p className="text-slate-500">Loading your dashboard...</p>
+  if (!data) return <PageSkeleton />
 
   const { readiness, skills, projects, certificates, dsa, roadmap, interviews, applications, resume, nextActions } = data
 

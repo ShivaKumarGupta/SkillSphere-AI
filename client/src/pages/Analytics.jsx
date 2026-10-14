@@ -15,6 +15,7 @@ import {
 import api from '../api/axios'
 import { todayKey } from '../utils/date'
 import { DIFFICULTY_COLORS } from '../constants/dsa'
+import PageSkeleton from '../components/PageSkeleton'
 
 const shortDate = (iso) =>
   new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', timeZone: 'UTC' })
@@ -85,7 +86,7 @@ export default function Analytics() {
   }, [])
 
   if (error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>
-  if (!data) return <p className="text-slate-500">Loading...</p>
+  if (!data) return <PageSkeleton />
 
   const { skills, dsa, interviews, resume, applications, roadmap, activity } = data
 

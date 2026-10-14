@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import TagInput from '../components/TagInput'
 import { useNavigate } from 'react-router-dom'
+import ResumeDocument from '../components/ResumeDocument'
+import ResumeScaler from '../components/ResumeScaler'
+import { TEMPLATES, ACCENT_OPTIONS } from '../constants/resume'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500 disabled:bg-slate-100'
@@ -35,6 +38,8 @@ const textToLines = (text) =>
 const toForm = (r) => ({
   contact: Object.fromEntries(CONTACT_FIELDS.map(([key]) => [key, r.contact?.[key] || ''])),
   summary: r.summary || '',
+  template: r.template || 'classic',
+  accent: r.accent || 'teal',
   education: (r.education || []).map((e) => ({ ...BLANK.education, ...e })),
   skills: r.skills || [],
   projects: (r.projects || []).map((p) => ({
@@ -60,6 +65,8 @@ const toForm = (r) => ({
 const fromForm = (f) => ({
   contact: f.contact,
   summary: f.summary,
+  template: f.template,
+  accent: f.accent,
   education: f.education,
   skills: f.skills,
   projects: f.projects.map(({ bulletsText, ...p }) => ({ ...p, bullets: textToLines(bulletsText) })),
@@ -135,6 +142,7 @@ export default function Resume() {
   const [loadError, setLoadError] = useState('')
   const [message, setMessage] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [view, setView] = useState('edit')
 
   useEffect(() => {
     api
@@ -212,6 +220,7 @@ export default function Resume() {
 
   if (loadError) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{loadError}</p>
   if (!form) return <p className="text-slate-500">Loading your resume...</p>
+  const previewResume = fromForm(form)
 
   return (
     <div className="space-y-6">
@@ -259,6 +268,97 @@ export default function Resume() {
           {message.text}
         </p>
       )}
+
+      
+      <div className="flex gap-2 xl:hidden">
+        <button
+          type="button"
+          onClick={() => setView('edit')}
+          aria-pressed={view === 'edit'}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-semibold ${
+            view === 'edit'
+              ? 'bg-indigo-700 text-white'
+              : 'bg-white text-slate-700 shadow-sm'
+          }`}
+        >
+          Edit
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setView('preview')}
+          aria-pressed={view === 'preview'}
+          className={`flex-1 rounded-lg px-4 py-2 text-sm font-semibold ${
+            view === 'preview'
+              ? 'bg-indigo-700 text-white'
+              : 'bg-white text-slate-700 shadow-sm'
+          }`}
+        >
+          Preview
+        </button>
+      </div>
+
+      <div className="grid items-start gap-6 xl:grid-cols-2">
+        <div
+          className={`min-w-0 space-y-6 ${
+            view === 'preview' ? 'hidden xl:block' : ''
+          }`}
+        >
+          <Section
+            title="Design"
+            hint="All templates are single-column with real text, so ATS software reads them in the right order."
+          >
+            <div className="grid gap-3 sm:grid-cols-3">
+              {TEMPLATES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTop('template', t.id)}
+                  aria-pressed={form.template === t.id}
+                  className={`rounded-xl border-2 p-3 text-left ${
+                    form.template === t.id
+                      ? 'border-indigo-600 bg-indigo-50'
+                      : 'border-slate-200 hover:border-indigo-300'
+                  }`}
+                >
+                  <span className="font-semibold text-slate-800">
+                    {t.name}
+                  </span>
+                  <span className="mt-1 block text-xs text-slate-500">
+                    {t.description}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div>
+              <p className="text-sm font-medium text-slate-700">
+                Accent colour
+              </p>
+              <div className="mt-2 flex flex-wrap gap-3">
+                {ACCENT_OPTIONS.map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => setTop('accent', a.id)}
+                    aria-label={a.label}
+                    aria-pressed={form.accent === a.id}
+                    title={a.label}
+                    className={`h-8 w-8 rounded-full ring-offset-2 ${
+                      form.accent === a.id
+                        ? 'ring-2 ring-slate-800'
+                        : 'ring-1 ring-slate-300'
+                    }`}
+                    style={{ backgroundColor: a.color }}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-slate-400">
+                The accent colours the name and section headings. Classic
+                stays black and white.
+              </p>
+            </div>
+          </Section>
 
       <Section title="Contact details">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -505,6 +605,24 @@ export default function Resume() {
       >
         {saving ? 'Saving...' : 'Save resume'}
       </button>
+      
+        </div>
+
+        <div
+          className={`min-w-0 xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto ${
+            view === 'edit' ? 'hidden xl:block' : ''
+          }`}
+        >
+          <div className="rounded-2xl bg-slate-200 p-3">
+            <ResumeScaler>
+              <ResumeDocument resume={previewResume} />
+            </ResumeScaler>
+          </div>
+          <p className="mt-2 text-center text-xs text-slate-400">
+            Live preview. Click Save resume to keep your changes.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }

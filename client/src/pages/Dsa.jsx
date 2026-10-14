@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import DsaStats from '../components/DsaStats'
 import { PLATFORMS, DIFFICULTIES, TOPICS, DIFFICULTY_BADGES } from '../constants/dsa'
+import PageSkeleton from '../components/PageSkeleton'
 
 const inputClass =
   'mt-1 w-full rounded-lg border border-slate-300 p-2.5 outline-none focus:border-indigo-500'
@@ -128,7 +129,7 @@ export default function Dsa() {
     await fetchStats()
   }
 
-  if (loading) return <p className="text-slate-500">Loading your DSA progress...</p>
+  if (loading) return <PageSkeleton />
 
   const visible = showAll ? problems : problems.slice(0, PAGE_SIZE)
 

@@ -57,6 +57,8 @@ const handleError = (res, error) => {
 
 // ---------- validate and clean what the student sends ----------
 
+const TEMPLATES = ['classic', 'modern', 'compact']
+const ACCENTS = ['teal', 'navy', 'plum', 'forest', 'charcoal']
 const parseResume = (body) => {
   const c = obj(body.contact)
   const email = str(c.email, 100)
@@ -73,6 +75,8 @@ const parseResume = (body) => {
       portfolio: url(c.portfolio, 'Portfolio link'),
     },
     summary: str(body.summary, 600),
+    template: TEMPLATES.includes(body.template) ? body.template : 'classic',
+    accent: ACCENTS.includes(body.accent) ? body.accent : 'teal',
     education: list(body.education, 6)
       .map((e) => ({
         institution: str(e.institution, 150),

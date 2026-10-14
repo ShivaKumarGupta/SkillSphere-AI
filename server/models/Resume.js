@@ -83,6 +83,8 @@ const resumeSchema = new mongoose.Schema(
     achievements: [{ type: String, trim: true, maxlength: 300 }],
     certifications: [certificationSchema],
     codingProfiles: [codingProfileSchema],
+    template: { type: String, enum: ['classic', 'modern', 'compact'], default: 'classic' },
+    accent: { type: String, enum: ['teal', 'navy', 'plum', 'forest', 'charcoal'], default: 'teal' },
   },
   { timestamps: true }
 )

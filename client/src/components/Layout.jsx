@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar, { Brand } from './Sidebar'
 
 export default function Layout() {
   const [open, setOpen] = useState(false)
+  const { pathname } = useLocation()
+
+  // The resume editor needs room for the editor and the preview side by side
+  const wide = pathname === '/resume'
 
   // Escape closes the menu on phones
   useEffect(() => {
@@ -43,7 +47,11 @@ export default function Layout() {
           </button>
         </header>
 
-        <main className="mx-auto max-w-5xl p-4 sm:p-6 lg:p-8 print:max-w-none print:p-0">
+        <main
+          className={`mx-auto p-4 sm:p-6 lg:p-8 print:max-w-none print:p-0 ${
+            wide ? 'max-w-[1500px]' : 'max-w-5xl'
+          }`}
+        >
           <Outlet />
         </main>
       </div>
